@@ -1,4 +1,5 @@
 import os
+from typing import AsyncGenerator
 
 import litellm
 
@@ -27,3 +28,23 @@ async def call_llm(messages: list[dict], system: str) -> str:
     if not content:
         raise ValueError("LLM returned empty response")
     return content
+
+
+async def stream_llm(
+    messages: list[dict],
+    system: str,
+) -> AsyncGenerator[str, None]:
+    full_messages = [{"role": "system", "content": system}] + messages
+
+    model = f"{settings.provider}/{settings.model}"
+
+    response = await litellm.acompletion(
+        model=model,
+        messages=full_messages,
+        stream=True,
+    )
+
+    async for chunk in response:
+        delta = chunk.choices[0].delta.content
+        if delta:
+            yield delta

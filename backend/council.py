@@ -11,7 +11,7 @@ from backend.models import CouncilResult, DebateMessage, ScoreCard, Verdict
 
 @dataclass
 class CouncilEvent:
-    type: str
+    type: str  # "chunk" | "message" | "score" | "refined" | "done"
     agent: str | None = None
     content: str | None = None
     round: int = 0
@@ -43,7 +43,10 @@ class Council:
             current_idea = refined
 
             for turn in range(1, turns_per_round + 1):
-                critic_out = await self.critic.respond(full_idea, history)
+                critic_out = ""
+                async for chunk in self.critic.stream_respond(full_idea, history):
+                    critic_out += chunk
+                    yield CouncilEvent(type="chunk", agent=self.critic.name, content=chunk, round=iteration)
                 history.append(
                     DebateMessage(
                         agent=self.critic.name,
@@ -54,7 +57,10 @@ class Council:
                 )
                 yield CouncilEvent(type="message", agent=self.critic.name, content=critic_out, round=iteration)
 
-                appraiser_out = await self.appraiser.respond(full_idea, history)
+                appraiser_out = ""
+                async for chunk in self.appraiser.stream_respond(full_idea, history):
+                    appraiser_out += chunk
+                    yield CouncilEvent(type="chunk", agent=self.appraiser.name, content=chunk, round=iteration)
                 history.append(
                     DebateMessage(
                         agent=self.appraiser.name,
@@ -110,12 +116,16 @@ async def main():
     args = parser.parse_args()
 
     council = Council()
+    print(f"Idea: {args.idea}")
+    print(f"Iterations: {args.iterations} | Turns per round: {args.turns}")
+    print("-" * 40)
     async for event in council.run(args.idea, args.iterations, args.turns):
-        if event.type == "message":
-            print(f"\n=== {event.agent} (Round {event.round}) ===")
-            print(event.content)
+        if event.type == "chunk":
+            print(event.content, end="", flush=True)
+        elif event.type == "message":
+            pass  # already printed via chunks
         elif event.type == "score" and event.score_card:
-            print(f"\n=== SCORES (Round {event.round}) ===")
+            print(f"\n\n=== SCORES (Round {event.round}) ===")
             for dim in ["viability", "novelty", "risk", "potential"]:
                 score = getattr(event.score_card, dim)
                 print(f"  {dim}: {score.score}/10 — {score.reasoning}")
@@ -123,8 +133,8 @@ async def main():
             print(f"\n=== REFINED (Round {event.round}) ===")
             print(event.content)
         elif event.type == "done":
-            print(f"\n=== DONE ===")
-            print(f"Final idea: {event.content}")
+            print(f"\n\n=== FINAL IDEA ===")
+            print(event.content)
 
 
 if __name__ == "__main__":
