@@ -56,24 +56,24 @@ A step-by-step build guide. Work through phases in order.
 
 > Build the three agents as Python classes. Test them standalone before wiring to the council.
 
-- [ ] Create `backend/agents/base.py` — `BaseAgent` with `name`, `system_prompt`, `respond()`
+- [x] Create `backend/agents/base.py` — `BaseAgent` with `name`, `system_prompt`, `respond()`
   - `respond(idea: str, history: list[DebateMessage]) → str`
   - Calls `call_llm()` internally with the agent's system prompt + full debate history
-- [ ] Create `backend/agents/critic.py` — adversarial persona
+- [x] Create `backend/agents/critic.py` — adversarial persona
   - Forcefully argues against the idea, finds flaws, stress-tests assumptions
   - Should reference specific weaknesses rather than giving generic criticism
-- [ ] Create `backend/agents/appraiser.py` — advocate persona
+- [x] Create `backend/agents/appraiser.py` — advocate persona
   - Argues for the idea's merit, counters the Critic's specific points directly
   - Should not ignore what the Critic said — engage with it
-- [ ] Create `backend/agents/judge.py` — observer/synthesiser persona
+- [x] Create `backend/agents/judge.py` — observer/synthesiser persona
   - Only called once at the end of each debate round, never during back-and-forth
   - Produces a `ScoreCard` and a refined version of the idea
-- [ ] Define Pydantic models in `backend/models.py`
+- [x] Define Pydantic models in `backend/models.py`
   - `DebateMessage`: `agent`, `role`, `content`, `round`
   - `ScoreCard`: `viability`, `novelty`, `risk`, `potential` (each 1–10 + one-line reasoning)
   - `Verdict`: `score_card`, `refined_idea`, `summary`
   - `CouncilResult`: `original_idea`, `iterations: list[Verdict]`
-- [ ] Unit test each agent in isolation — just a plain Python script, print the outputs
+- [x] Unit test each agent in isolation — just a plain Python script, print the outputs
   - Confirm the Critic and Appraiser respond differently in tone and stance
 
 ---
