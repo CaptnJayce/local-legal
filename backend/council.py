@@ -124,35 +124,96 @@ class Council:
         )
 
 
+def _colour(text: str, colour: str) -> str:
+    codes = {
+        "red": "\033[91m",
+        "green": "\033[92m",
+        "yellow": "\033[93m",
+        "blue": "\033[94m",
+        "magenta": "\033[95m",
+        "cyan": "\033[96m",
+        "bold": "\033[1m",
+        "reset": "\033[0m",
+    }
+    return f"{codes.get(colour, '')}{text}{codes['reset']}"
+
+
 async def main():
     import argparse
+    import sys
 
     parser = argparse.ArgumentParser()
     parser.add_argument("idea", nargs="?", default="A subscription box for hackers")
     parser.add_argument("--iterations", type=int, default=1)
     parser.add_argument("--turns", type=int, default=3)
+    parser.add_argument("--no-color", action="store_true", help="Disable coloured output")
     args = parser.parse_args()
 
+    use_colour = not args.no_color and sys.stdout.isatty()
+
+    def c(text: str, colour: str) -> str:
+        return text if not use_colour else _colour(text, colour)
+
     council = Council()
-    print(f"Idea: {args.idea}")
-    print(f"Iterations: {args.iterations} | Turns per round: {args.turns}")
-    print("-" * 40)
+
+    print()
+    print(c("═" * 50, "cyan"))
+    print(c("  LOCAL LEGAL COUNCIL", "bold"))
+    print(c("═" * 50, "cyan"))
+    print()
+    print(c(f"  Idea: ", "bold") + args.idea)
+    print(c(f"  Iterations: {args.iterations}  |  Turns: {args.turns}", "yellow"))
+    print()
+    print(c("─" * 50, "cyan"))
+    print()
+
+    current_agent = None
+
     async for event in council.run(args.idea, args.iterations, args.turns):
         if event.type == "chunk":
+            if event.agent != current_agent:
+                if current_agent is not None:
+                    print()
+                    print(c("─" * 50, "cyan"))
+                    print()
+                colour = {"Critic": "red", "Appraiser": "green", "Judge": "yellow"}.get(event.agent, "white")
+                print(c(f"┌─ {event.agent.upper()} ", colour) + c("─" * 30, "cyan"))
+                current_agent = event.agent
             print(event.content, end="", flush=True)
-        elif event.type == "message":
-            pass  # already printed via chunks
+
         elif event.type == "score" and event.score_card:
-            print(f"\n\n=== SCORES (Round {event.round}) ===")
+            current_agent = None
+            print()
+            print(c("─" * 50, "cyan"))
+            print()
+            print(c(f"  ⚖ JUDGE'S SCORECARD — Round {event.round}", "bold yellow"))
+            print()
             for dim in ["viability", "novelty", "risk", "potential"]:
                 score = getattr(event.score_card, dim)
-                print(f"  {dim}: {score.score}/10 — {score.reasoning}")
+                bar = "█" * score.score + "░" * (10 - score.score)
+                print(f"    {dim:10} {bar} {score.score}/10")
+                print(f"              {score.reasoning}")
+                print()
+
         elif event.type == "refined":
-            print(f"\n=== REFINED (Round {event.round}) ===")
-            print(event.content)
+            print()
+            print(c("─" * 50, "cyan"))
+            print()
+            print(c(f"  ✨ REFINED IDEA — Round {event.round}", "bold cyan"))
+            print()
+            print(f"  {event.content}")
+            print()
+
         elif event.type == "done":
-            print(f"\n\n=== FINAL IDEA ===")
-            print(event.content)
+            print(c("─" * 50, "cyan"))
+            print()
+            print(c("  ═" * 25, "green"))
+            print(c(f"  FINAL IDEA", "bold green"))
+            print(c("  ═" * 25, "green"))
+            print()
+            print(f"  {event.content}")
+            print()
+            print(c("═" * 50, "cyan"))
 
 
 if __name__ == "__main__":
