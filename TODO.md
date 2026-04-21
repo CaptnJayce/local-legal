@@ -82,18 +82,18 @@ A step-by-step build guide. Work through phases in order.
 
 > Wire the agents into a debate loop. This is the core of the project.
 
-- [ ] Create `backend/council.py` — `Council` class that owns all three agents
-- [ ] Implement `run(idea: str, iterations: int, turns_per_round: int) → AsyncGenerator`
+- [x] Create `backend/council.py` — `Council` class that owns all three agents
+- [x] Implement `run(idea: str, iterations: int, turns_per_round: int) → AsyncGenerator`
   - Outer loop: runs `iterations` times, feeding the refined idea back each time
   - Inner loop: Critic → Appraiser → repeat `turns_per_round` times
   - After inner loop: Judge scores and produces a refined idea
   - Yield each event as it happens (streaming-first design)
-- [ ] Define the event schema yielded by the generator
-  - `{ type: "message" | "score" | "refined" | "done", agent: str, content: str, round: int }`
-- [ ] Add streaming support — use `litellm` with `stream=True`, yield chunks incrementally
+- [x] Define the event schema yielded by the generator
+  - `{ type: "chunk" | "message" | "score" | "refined" | "done", agent: str, content: str, round: int }`
+- [x] Add streaming support — use `litellm` with `stream=True`, yield chunks incrementally
   - Yield partial content as it arrives, don't wait for the full response
-- [ ] Test end-to-end in a standalone script
-  - `python -m backend.council "my idea here" --iterations 2 --turns 3`
+- [x] Test end-to-end in a standalone script
+  - `python -m backend.council "my idea here" --iterations 1 --turns 1`
   - Read through the full output and check the debate feels coherent
 
 ---
