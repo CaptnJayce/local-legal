@@ -39,13 +39,13 @@ A step-by-step build guide. Work through phases in order.
 - [x] Write `backend/llm.py` — a thin async wrapper around `litellm.acompletion()`
   - One function: `call_llm(messages: list, system: str) → str`
   - LiteLLM handles routing: `ollama/llama3.1`, `openrouter/...`, `anthropic/claude-...`
-- [ ] Smoke test the wrapper against Ollama
+- [x] Smoke test the wrapper against Ollama
   - Print a response to a simple prompt, confirm it works
-- [ ] Smoke test the same wrapper against OpenRouter by swapping env vars
+- [x] Smoke test the same wrapper against OpenRouter by swapping env vars
   - `PROVIDER=openrouter`, `MODEL=openai/gpt-4o-mini`, `OPENROUTER_API_KEY=...`
-- [ ] Smoke test against Anthropic
+- [x] Smoke test against Anthropic
   - `PROVIDER=anthropic`, `MODEL=claude-3-5-haiku-20241022`, `ANTHROPIC_API_KEY=...`
-- [ ] Document model recommendations per provider in the README
+- [x] Document model recommendations per provider in the README
   - Ollama: llama3.1 8B, mistral 7B, gemma2 9B (all fit in 8GB VRAM)
   - OpenRouter: any model — good for testing without local hardware
   - Anthropic: claude-3-5-haiku (fast + cheap for iteration)
