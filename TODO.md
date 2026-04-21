@@ -31,12 +31,12 @@ A step-by-step build guide. Work through phases in order.
 > Wire up LiteLLM so Ollama is the default and OpenRouter/Anthropic are drop-in alternatives.
 > The goal: swap providers with a config change, no code changes.
 
-- [ ] Install Ollama and pull a model that fits in 8GB VRAM
+- [x] Install Ollama and pull a model that fits in 8GB VRAM
   - `ollama pull llama3.1` (8B — good default) or `ollama pull mistral`
-- [ ] Create `backend/config.py` — load provider settings from `.env`
+- [x] Create `backend/config.py` — load provider settings from `.env`
   - Required vars: `PROVIDER`, `MODEL`, and optionally `OLLAMA_BASE_URL`, `OPENROUTER_API_KEY`, `ANTHROPIC_API_KEY`
   - Default: `PROVIDER=ollama`, `MODEL=llama3.1`
-- [ ] Write `backend/llm.py` — a thin async wrapper around `litellm.acompletion()`
+- [x] Write `backend/llm.py` — a thin async wrapper around `litellm.acompletion()`
   - One function: `call_llm(messages: list, system: str) → str`
   - LiteLLM handles routing: `ollama/llama3.1`, `openrouter/...`, `anthropic/claude-...`
 - [ ] Smoke test the wrapper against Ollama
