@@ -23,16 +23,21 @@ class BaseAgent:
         messages = []
 
         if history:
-            for msg in history:
+            for i, msg in enumerate(history):
                 messages.append({
-                    "role": "user",
+                    "role": "assistant",
                     "content": self._format_message(msg),
                 })
+                messages.append({
+                    "role": "user",
+                    "content": f"Current idea under discussion: {idea}",
+                })
 
-        messages.append({
-            "role": "user",
-            "content": f"Current idea under discussion: {idea}",
-        })
+        else:
+            messages.append({
+                "role": "user",
+                "content": f"Current idea under discussion: {idea}",
+            })
 
         return messages
 

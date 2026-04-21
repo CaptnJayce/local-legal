@@ -93,12 +93,30 @@ class Council:
         yield CouncilEvent(type="done", agent=None, content=refined, round=iterations)
 
     def _parse_verdict(self, raw: str) -> Verdict:
-        start = raw.find("{")
-        end = raw.rfind("}") + 1
-        if start == -1 or end == 0:
-            raise ValueError(f"Could not parse verdict from output: {raw[:200]}")
-        json_str = raw[start:end]
-        data = json.loads(json_str)
+        json_start = -1
+        for i, char in enumerate(raw):
+            if char == "{":
+                potential = raw[i:]
+                if '"score_card"' in potential or '"viability"' in potential:
+                    json_start = i
+                    break
+
+        if json_start == -1:
+            raise ValueError(f"Could not find JSON in output: {raw[:200]}")
+
+        json_str = raw[json_start:]
+        brace_count = 0
+        json_end = len(json_str)
+        for i, char in enumerate(json_str):
+            if char == "{":
+                brace_count += 1
+            elif char == "}":
+                brace_count -= 1
+                if brace_count == 0:
+                    json_end = i + 1
+                    break
+
+        data = json.loads(json_str[:json_end])
         return Verdict(
             score_card=ScoreCard(**data["score_card"]),
             refined_idea=data["refined_idea"],
