@@ -1,7 +1,9 @@
 import asyncio
 import json
-from dataclasses import dataclass, field
+import re
 from typing import AsyncGenerator
+
+from pydantic import BaseModel
 
 from backend.agents.appraiser import Appraiser
 from backend.agents.critic import Critic
@@ -9,9 +11,8 @@ from backend.agents.judge import Judge
 from backend.models import CouncilResult, DebateMessage, ScoreCard, Verdict
 
 
-@dataclass
-class CouncilEvent:
-    type: str  # "chunk" | "message" | "score" | "refined" | "done"
+class CouncilEvent(BaseModel):
+    type: str
     agent: str | None = None
     content: str | None = None
     round: int = 0
@@ -40,7 +41,6 @@ class Council:
 
             full_idea = f"{refined}\n\n{description}" if description else refined
             history: list[DebateMessage] = []
-            current_idea = refined
 
             for turn in range(1, turns_per_round + 1):
                 critic_out = ""
@@ -94,43 +94,18 @@ class Council:
 
     def _parse_verdict(self, raw: str) -> Verdict:
         cleaned = raw.strip()
-        if cleaned.startswith("```"):
-            backtick_pos = cleaned.find("```", 3)
-            if backtick_pos != -1:
-                cleaned = cleaned[backtick_pos+3:]
-                if cleaned.strip().startswith("json"):
-                    cleaned = cleaned[4:]
-        cleaned = cleaned.strip()
-
-        json_start = -1
-        for i, char in enumerate(cleaned):
-            if char == "{":
-                potential = cleaned[i:]
-                if '"score_card"' in potential or '"viability"' in potential:
-                    json_start = i
-                    break
-
-        if json_start == -1:
-            raise ValueError(f"Could not find JSON in output: {raw[:200]}")
-
-        json_str = cleaned[json_start:]
-        brace_count = 0
-        json_end = len(json_str)
-        for i, char in enumerate(json_str):
-            if char == "{":
-                brace_count += 1
-            elif char == "}":
-                brace_count -= 1
-                if brace_count == 0:
-                    json_end = i + 1
-                    break
-
-        data = json.loads(json_str[:json_end])
-        return Verdict(
-            score_card=ScoreCard(**data["score_card"]),
-            refined_idea=data["refined_idea"],
-            summary=data["summary"],
-        )
+        try:
+            data = json.loads(cleaned)
+        except json.JSONDecodeError:
+            match = re.search(r'\{.*\}', cleaned, re.DOTALL)
+            if not match:
+                raise ValueError(f"Could not find JSON in Judge output: {raw[:200]}")
+            data = json.loads(match.group())
+        if isinstance(data.get("refined_idea"), dict):
+            data["refined_idea"] = " ".join(str(v) for v in data["refined_idea"].values())
+        if isinstance(data.get("summary"), dict):
+            data["summary"] = " ".join(str(v) for v in data["summary"].values())
+        return Verdict.model_validate(data)
 
 
 def _colour(text: str, colour: str) -> str:

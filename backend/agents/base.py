@@ -20,26 +20,11 @@ class BaseAgent:
             yield chunk
 
     def _build_messages(self, idea: str, history: list[DebateMessage]) -> list[dict]:
-        messages = []
-
+        content = f"Idea under discussion: {idea}"
         if history:
-            for i, msg in enumerate(history):
-                messages.append({
-                    "role": "assistant",
-                    "content": self._format_message(msg),
-                })
-                messages.append({
-                    "role": "user",
-                    "content": f"Current idea under discussion: {idea}",
-                })
-
-        else:
-            messages.append({
-                "role": "user",
-                "content": f"Current idea under discussion: {idea}",
-            })
-
-        return messages
-
-    def _format_message(self, msg: DebateMessage) -> str:
-        return f"[{msg.agent}] (Round {msg.round}): {msg.content}"
+            history_block = "\n\n".join(
+                f"[{msg.agent} — Round {msg.round}]: {msg.content}"
+                for msg in history
+            )
+            content += f"\n\nDebate so far:\n{history_block}"
+        return [{"role": "user", "content": content}]

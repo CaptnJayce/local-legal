@@ -21,7 +21,7 @@ After reading the idea and the full debate history, output ONLY valid JSON. No p
 Rules:
 - Output ONLY the JSON. Nothing else.
 - Scores are 1-10 integers. Rate the idea honestly. If it is genuinely poor, say so.
-- "refined_idea" should be a stronger version of the original, incorporating what the debate revealed. Only refine if the debate produced genuine improvements.
-- "summary" is 2-3 sentences distilling the key takeaways.
+- "refined_idea" must be a plain string — a single paragraph of text. Not an object, not a list, not structured. Just a string.
+- "summary" must be a plain string — 2-3 sentences of text. Not an object. Just a string.
 
 You score honestly. You synthesise fairly."""
