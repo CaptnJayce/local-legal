@@ -93,10 +93,19 @@ class Council:
         yield CouncilEvent(type="done", agent=None, content=refined, round=iterations)
 
     def _parse_verdict(self, raw: str) -> Verdict:
+        cleaned = raw.strip()
+        if cleaned.startswith("```"):
+            backtick_pos = cleaned.find("```", 3)
+            if backtick_pos != -1:
+                cleaned = cleaned[backtick_pos+3:]
+                if cleaned.strip().startswith("json"):
+                    cleaned = cleaned[4:]
+        cleaned = cleaned.strip()
+
         json_start = -1
-        for i, char in enumerate(raw):
+        for i, char in enumerate(cleaned):
             if char == "{":
-                potential = raw[i:]
+                potential = cleaned[i:]
                 if '"score_card"' in potential or '"viability"' in potential:
                     json_start = i
                     break
@@ -104,7 +113,7 @@ class Council:
         if json_start == -1:
             raise ValueError(f"Could not find JSON in output: {raw[:200]}")
 
-        json_str = raw[json_start:]
+        json_str = cleaned[json_start:]
         brace_count = 0
         json_end = len(json_str)
         for i, char in enumerate(json_str):
