@@ -102,15 +102,15 @@ A step-by-step build guide. Work through phases in order.
 
 > Expose the council as a streaming HTTP API.
 
-- [ ] Create `backend/main.py` with a FastAPI app
-- [ ] Add `GET /health` — returns `{ status: "ok", provider: "...", model: "..." }`
-- [ ] Add `POST /session` — accepts `{ idea, iterations, turns_per_round }`
+- [x] Create `backend/main.py` with a FastAPI app
+- [x] Add `GET /health` — returns `{ status: "ok", provider: "...", model: "..." }`
+- [x] Add `POST /session` — accepts `{ idea, iterations, turns_per_round }`
   - Returns a `StreamingResponse` using Server-Sent Events (SSE)
   - Each SSE event is one JSON object matching the event schema from Phase 4
-- [ ] Add CORS middleware
+- [x] Add CORS middleware
   - Allow `http://localhost:5173` (Vite dev server) in development
-- [ ] Add `GET /config` — returns current provider and model (no keys) so the frontend can display it
-- [ ] Test the stream endpoint with curl
+- [x] Add `GET /config` — returns current provider and model (no keys) so the frontend can display it
+- [x] Test the stream endpoint with curl
   - `curl -N -X POST http://localhost:8000/session -H "Content-Type: application/json" -d '{"idea":"a subscription box for hackers","iterations":1,"turns_per_round":3}'`
 
 ---
