@@ -1,7 +1,7 @@
 import asyncio
 import json
 import re
-from typing import AsyncGenerator
+from typing import AsyncGenerator, Literal
 
 from pydantic import BaseModel
 
@@ -12,7 +12,7 @@ from backend.models import CouncilResult, DebateMessage, ScoreCard, Verdict
 
 
 class CouncilEvent(BaseModel):
-    type: str
+    type: Literal["chunk", "message", "score", "refined", "done"]
     agent: str | None = None
     content: str | None = None
     round: int = 0
@@ -70,6 +70,8 @@ class Council:
                     )
                 )
                 yield CouncilEvent(type="message", agent=self.appraiser.name, content=appraiser_out, round=iteration)
+
+            yield CouncilEvent(type="message", agent=self.judge.name, content="Scoring...", round=iteration)
 
             judge_out = await self.judge.respond(full_idea, history)
 
