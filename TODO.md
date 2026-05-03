@@ -119,29 +119,29 @@ A step-by-step build guide. Work through phases in order.
 
 > Build the UI. Stream the debate in real time, display scores and the refined idea.
 
-- [ ] Set up a typed API client in `frontend/src/api.ts`
+- [x] Set up a typed API client in `frontend/src/api.ts`
   - Wraps `EventSource`, parses each SSE event, returns typed objects
-- [ ] Write `useCouncil()` hook
+- [x] Write `useCouncil()` hook
   - Opens `EventSource` to `/session` on submit
   - Accumulates messages, scores, and refined idea in state
   - Exposes `messages`, `verdict`, `isRunning`, `submit(idea, iterations, turns)`
-- [ ] Build `IdeaInput` component
+- [x] Build `IdeaInput` component
   - Textarea for the idea, number inputs for iterations and turns per round, submit button
   - Disable inputs while a session is running
-- [ ] Build `AgentMessage` component
+- [x] Build `AgentMessage` component
   - Renders one debate message: agent name badge, content, round indicator
   - Critic = red badge, Appraiser = green, Judge = amber
-- [ ] Build `CouncilRoom` component
+- [x] Build `CouncilRoom` component
   - Scrolling list of `AgentMessage` components
   - Auto-scrolls to bottom as messages stream in
   - Shows a "thinking" indicator (pulsing agent name) while awaiting a response
-- [ ] Build `ScoreCard` component
+- [x] Build `ScoreCard` component
   - Displays the four Judge scores with a bar or number per dimension
   - Shows the one-line reasoning for each score
-- [ ] Build `RefinedIdea` component
+- [x] Build `RefinedIdea` component
   - Displays the improved idea text from each iteration
   - Visually distinct — this is the headline output of each round
-- [ ] Wire everything together in `App.tsx`
+- [x] Wire everything together in `App.tsx`
 - [ ] Add an iteration timeline if multiple iterations were run
   - Let the user compare original idea → iteration 1 → iteration 2 etc.
 

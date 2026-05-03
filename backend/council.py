@@ -75,7 +75,7 @@ class Council:
 
             judge_out = await self.judge.respond(full_idea, history)
 
-            verdict = self._parse_verdict(judge_out)
+            verdict = self._parse_verdict(judge_out, fallback_idea=refined)
 
             yield CouncilEvent(
                 type="score",
@@ -94,7 +94,7 @@ class Council:
 
         yield CouncilEvent(type="done", agent=None, content=refined, round=iterations)
 
-    def _parse_verdict(self, raw: str) -> Verdict:
+    def _parse_verdict(self, raw: str, fallback_idea: str = "") -> Verdict:
         cleaned = raw.strip()
         try:
             data = json.loads(cleaned)
@@ -103,10 +103,21 @@ class Council:
             if not match:
                 raise ValueError(f"Could not find JSON in Judge output: {raw[:200]}")
             data = json.loads(match.group())
+
+        score_card = data.setdefault("score_card", {})
+        for dim in ("viability", "novelty", "risk", "potential"):
+            score_card.setdefault(dim, {"score": 5, "reasoning": "Not assessed."})
+
         if isinstance(data.get("refined_idea"), dict):
             data["refined_idea"] = " ".join(str(v) for v in data["refined_idea"].values())
+        if not data.get("refined_idea"):
+            data["refined_idea"] = fallback_idea
+
         if isinstance(data.get("summary"), dict):
             data["summary"] = " ".join(str(v) for v in data["summary"].values())
+        if not data.get("summary"):
+            data["summary"] = "No summary provided."
+
         return Verdict.model_validate(data)
 
 
