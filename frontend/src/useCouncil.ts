@@ -17,6 +17,7 @@ export function useCouncil() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [streaming, setStreaming] = useState<Message | null>(null);
   const [results, setResults] = useState<IterationResult[]>([]);
+  const [originalIdea, setOriginalIdea] = useState<string | null>(null);
   const [isRunning, setIsRunning] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -77,6 +78,7 @@ export function useCouncil() {
     setMessages([]);
     setStreaming(null);
     setResults([]);
+    setOriginalIdea(idea);
     setError(null);
     setIsRunning(true);
     pendingScoreRef.current = null;
@@ -97,5 +99,5 @@ export function useCouncil() {
     }
   }, [handleEvent]);
 
-  return { messages, streaming, results, isRunning, error, submit };
+  return { messages, streaming, results, originalIdea, isRunning, error, submit };
 }

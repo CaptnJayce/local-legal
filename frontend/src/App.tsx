@@ -3,10 +3,11 @@ import { IdeaInput } from "./components/IdeaInput";
 import { CouncilRoom } from "./components/CouncilRoom";
 import { ScoreCard } from "./components/ScoreCard";
 import { RefinedIdea } from "./components/RefinedIdea";
+import { IterationTimeline } from "./components/IterationTimeline";
 import "./App.css";
 
 export default function App() {
-  const { messages, streaming, results, isRunning, error, submit } = useCouncil();
+  const { messages, streaming, results, originalIdea, isRunning, error, submit } = useCouncil();
 
   return (
     <div className="app">
@@ -25,6 +26,9 @@ export default function App() {
             <RefinedIdea idea={result.refinedIdea} round={result.round} />
           </div>
         ))}
+        {results.length > 1 && originalIdea && (
+          <IterationTimeline originalIdea={originalIdea} results={results} />
+        )}
       </main>
     </div>
   );

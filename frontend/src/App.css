@@ -209,6 +209,69 @@ button[type="submit"]:disabled {
   gap: 1rem;
 }
 
+/* IterationTimeline */
+
+.timeline {
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 1rem;
+}
+
+.timeline-heading {
+  margin: 0 0 1rem;
+  font-size: 1rem;
+}
+
+.timeline-step {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.timeline-marker {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.timeline-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--accent);
+  margin-top: 0.2rem;
+  flex-shrink: 0;
+}
+
+.timeline-line {
+  flex: 1;
+  width: 2px;
+  background: var(--border);
+  margin: 4px 0;
+}
+
+.timeline-content {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  padding-bottom: 1rem;
+}
+
+.timeline-label {
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text);
+}
+
+.timeline-text {
+  font-size: 0.95rem;
+  line-height: 1.6;
+  color: var(--text-h);
+  margin: 0;
+}
+
 /* Error */
 
 .error {
