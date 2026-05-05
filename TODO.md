@@ -142,7 +142,7 @@ A step-by-step build guide. Work through phases in order.
   - Displays the improved idea text from each iteration
   - Visually distinct — this is the headline output of each round
 - [x] Wire everything together in `App.tsx`
-- [ ] Add an iteration timeline if multiple iterations were run
+- [x] Add an iteration timeline if multiple iterations were run
   - Let the user compare original idea → iteration 1 → iteration 2 etc.
 
 ---
@@ -151,17 +151,17 @@ A step-by-step build guide. Work through phases in order.
 
 > Let users switch providers and enter API keys without touching code.
 
-- [ ] Add a Settings panel to the frontend
+- [x] Add a Settings panel to the frontend
   - Provider selector: Ollama (default) / OpenRouter / Anthropic
   - Model name text input (pre-filled with a sensible default per provider)
   - API key input (hidden, only shown for OpenRouter and Anthropic)
   - Turns per round number input with a note that more turns = slower + more tokens
-- [ ] Store settings in `localStorage`
-- [ ] Pass provider/model/key as request headers or body fields to `/session`
-- [ ] Update the backend to accept per-request provider overrides
+- [x] Store settings in `localStorage`
+- [x] Pass provider/model/key as request headers or body fields to `/session`
+- [x] Update the backend to accept per-request provider overrides
   - Falls back to env vars if the request doesn't include them
-- [ ] Show current provider/model in the UI header (pulled from `GET /config`)
-- [ ] Write provider setup sections in the README
+- [x] Show current provider/model in the UI header (pulled from `GET /config`)
+- [x] Write provider setup sections in the README
   - **Ollama (default):** install guide, recommended models for 8GB VRAM, no API key needed
   - **OpenRouter:** where to get a key, recommended cheap models for testing
   - **Anthropic:** where to get a key, recommended model (haiku for speed/cost)

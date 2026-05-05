@@ -13,16 +13,24 @@ if settings.anthropic_api_key:
     os.environ["ANTHROPIC_API_KEY"] = settings.anthropic_api_key
 
 
-async def call_llm(messages: list[dict], system: str) -> str:
+def _resolve_model(provider: str | None, model: str | None) -> str:
+    return f"{provider or settings.provider}/{model or settings.model}"
 
+
+async def call_llm(
+    messages: list[dict],
+    system: str,
+    *,
+    provider: str | None = None,
+    model: str | None = None,
+    api_key: str | None = None,
+) -> str:
     full_messages = [{"role": "system", "content": system}] + messages
+    kwargs: dict = {"model": _resolve_model(provider, model), "messages": full_messages}
+    if api_key:
+        kwargs["api_key"] = api_key
 
-    model = f"{settings.provider}/{settings.model}"
-
-    response = await litellm.acompletion(
-        model=model,
-        messages=full_messages,
-    )
+    response = await litellm.acompletion(**kwargs)
 
     content = response.choices[0].message.content
     if not content:
@@ -33,16 +41,17 @@ async def call_llm(messages: list[dict], system: str) -> str:
 async def stream_llm(
     messages: list[dict],
     system: str,
+    *,
+    provider: str | None = None,
+    model: str | None = None,
+    api_key: str | None = None,
 ) -> AsyncGenerator[str, None]:
     full_messages = [{"role": "system", "content": system}] + messages
+    kwargs: dict = {"model": _resolve_model(provider, model), "messages": full_messages, "stream": True}
+    if api_key:
+        kwargs["api_key"] = api_key
 
-    model = f"{settings.provider}/{settings.model}"
-
-    response = await litellm.acompletion(
-        model=model,
-        messages=full_messages,
-        stream=True,
-    )
+    response = await litellm.acompletion(**kwargs)
 
     async for chunk in response:
         delta = chunk.choices[0].delta.content

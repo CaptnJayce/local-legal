@@ -33,8 +33,13 @@ class Council:
         iterations: int = 1,
         turns_per_round: int = 3,
         description: str = "",
+        *,
+        provider: str | None = None,
+        model: str | None = None,
+        api_key: str | None = None,
     ) -> AsyncGenerator[CouncilEvent, None]:
         refined = idea
+        llm_kwargs = {"provider": provider, "model": model, "api_key": api_key}
 
         for iteration in range(1, iterations + 1):
             yield CouncilEvent(type="message", agent=None, content=f"Iteration {iteration}", round=iteration)
@@ -44,7 +49,7 @@ class Council:
 
             for turn in range(1, turns_per_round + 1):
                 critic_out = ""
-                async for chunk in self.critic.stream_respond(full_idea, history):
+                async for chunk in self.critic.stream_respond(full_idea, history, **llm_kwargs):
                     critic_out += chunk
                     yield CouncilEvent(type="chunk", agent=self.critic.name, content=chunk, round=iteration)
                 history.append(
@@ -58,7 +63,7 @@ class Council:
                 yield CouncilEvent(type="message", agent=self.critic.name, content=critic_out, round=iteration)
 
                 appraiser_out = ""
-                async for chunk in self.appraiser.stream_respond(full_idea, history):
+                async for chunk in self.appraiser.stream_respond(full_idea, history, **llm_kwargs):
                     appraiser_out += chunk
                     yield CouncilEvent(type="chunk", agent=self.appraiser.name, content=chunk, round=iteration)
                 history.append(
@@ -73,7 +78,7 @@ class Council:
 
             yield CouncilEvent(type="message", agent=self.judge.name, content="Scoring...", round=iteration)
 
-            judge_out = await self.judge.respond(full_idea, history)
+            judge_out = await self.judge.respond(full_idea, history, **llm_kwargs)
 
             verdict = self._parse_verdict(judge_out, fallback_idea=refined)
 

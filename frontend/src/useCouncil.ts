@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { type CouncilEvent, type ScoreCard, startSession } from "./api";
+import { type SettingsState } from "./useSettings";
 
 export interface Message {
   agent: string;
@@ -71,7 +72,12 @@ export function useCouncil() {
     }
   }, []);
 
-  const submit = useCallback(async (idea: string, iterations: number, turns: number) => {
+  const submit = useCallback(async (
+    idea: string,
+    iterations: number,
+    turns: number,
+    settings?: SettingsState,
+  ) => {
     abortRef.current?.abort();
     abortRef.current = new AbortController();
 
@@ -85,7 +91,14 @@ export function useCouncil() {
 
     try {
       await startSession(
-        { idea, iterations, turns_per_round: turns },
+        {
+          idea,
+          iterations,
+          turns_per_round: turns,
+          provider: settings?.provider,
+          model: settings?.model,
+          api_key: settings?.apiKey,
+        },
         handleEvent,
         abortRef.current.signal,
       );

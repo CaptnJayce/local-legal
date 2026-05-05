@@ -1,64 +1,134 @@
 # local-legal
 
-A local LLM council made to thoroughly critique ideas you bring them, providing scores, appraisals, & criticisms. Run locally or with LLM providers.
+An LLM council that debates your ideas. Three agents — Critic, Appraiser, and Judge — argue a given idea across as many rounds as you want, score it, and produce a refined version.
 
 ## What it does
 
-You bring an idea. Three AI agents — Critic, Appraiser, and Judge — debate it in rounds. The Critic stress-tests it, the Appraiser counters and strengthens it, and the Judge scores it and produces a refined version. After however many rounds you want, you get scores and a stronger idea.
+Bring an idea. The Critic looks for holes, the Appraiser fights back and builds it up, and the Judge scores and refines. Set iterations higher to run the improved idea back through the whole cycle — each pass tightens it further.
 
-## Run it
+## Setup
+
+### Prerequisites
+
+- Python 3.11+
+- [Bun](https://bun.sh)
+- An LLM provider (see below)
+
+### Install
 
 ```bash
-# Activate the venv
-source .venv/bin/activate
+# Backend
+cd backend
+python -m venv .venv
+source .venv/bin/activate      # fish: source .venv/bin/activate.fish
+pip install -r requirements.txt
 
-# Run a debate
+# Frontend
+cd frontend
+bun install
+```
+
+### Configure
+
+Copy `.env.example` to `.env` and fill in the relevant values for your chosen provider. The app uses these as defaults — you can override them per-session from the settings panel.
+
+## Run
+
+```bash
+# Backend (from repo root, with venv active)
+PYTHONPATH=. uvicorn backend.main:app --reload
+
+# Frontend (separate terminal)
+cd frontend
+bun run dev
+```
+
+Open [http://localhost:5173](http://localhost:5173).
+
+### CLI (no frontend)
+
+```bash
 PYTHONPATH=. python -m backend.council "your idea here" --iterations 1 --turns 3
 ```
 
-`--iterations` — how many times the whole cycle repeats (more iterations = more refined the idea becomes).
-`--turns` — how many back-and-forth exchanges between Critic and Appraiser per round.
-
-## Important Note
-
-I don't have the greatest hardware - if you're a big AI enthusiast you likely have your own homelab. I have one GPU for gaming at 8GB VRAM, so tested local models are extremely limited.
+`--iterations` — how many full cycles to run. Each one refines the idea further.  
+`--turns` — back-and-forth exchanges between Critic and Appraiser per cycle.
 
 ## LLM Providers
 
-Change providers by modifying `PROVIDER` and `MODEL` in `.env`.
+Switch providers from the settings panel in the UI, or by editing `PROVIDER` and `MODEL` in `.env`.
 
-### Ollama (local, default)
+---
 
-Runs entirely on your machine — no API costs, no network, private.
+### Ollama (default — local, free, private)
 
-Requires [Ollama](https://ollama.com) installed and a model pulled:
+Runs on your machine. No API key, no cost, nothing leaves your network.
 
-```
+**Install:** [ollama.com](https://ollama.com)
+
+**Pull a model:**
+
+```bash
 ollama pull llama3.1
 ```
 
-| Model      | Params | VRAM | Notes    |
-| ---------- | ------ | ---- | -------- |
-| `llama3.1` | 8B     | ~6GB | Tested ✓ |
+**Recommended models for 8GB VRAM:**
+
+| Model        | Params | VRAM  | Notes           |
+| ------------ | ------ | ----- | --------------- |
+| `llama3.1`   | 8B     | ~6GB  | Tested, default |
+| `mistral`    | 7B     | ~5GB  | Fast            |
+| `gemma2`     | 9B     | ~8GB  | Good reasoning  |
+
+No API key needed. Set `PROVIDER=ollama` and `MODEL=llama3.1` in `.env`.
+
+---
 
 ### OpenRouter
 
-Requires `OPENROUTER_API_KEY` in `.env`.
+Routes to hundreds of models through one API key. Good if you want to try different cloud models without signing up everywhere, or just don't want to run things locally.
 
-| Model                | Notes   |
-| -------------------- | ------- |
-| `openai/gpt-4o-mini` | Testing |
+**Get a key:** [openrouter.ai/keys](https://openrouter.ai/keys)
+
+**Recommended models for testing:**
+
+| Model                      | Notes                        |
+| -------------------------- | ---------------------------- |
+| `openai/gpt-4o-mini`       | Fast and cheap, good default |
+| `anthropic/claude-haiku-4` | Strong reasoning, low cost   |
+| `google/gemini-flash-1.5`  | Very fast                    |
+
+Set `PROVIDER=openrouter`, `MODEL=openai/gpt-4o-mini`, and `OPENROUTER_API_KEY=<your key>` in `.env`.
+
+In the UI, enter your key in the API Key field after selecting OpenRouter. It stays in the browser and only goes to the backend when you start a session.
+
+---
 
 ### Anthropic
 
-Requires `ANTHROPIC_API_KEY` in `.env`.
+Direct access to Claude. Worth it if you're mostly using Claude anyway — skips the OpenRouter hop.
 
-| Model              | Notes   |
-| ------------------ | ------- |
-| `claude-3-5-haiku` | Testing |
+**Get a key:** [console.anthropic.com](https://console.anthropic.com)
 
-## Future Models
+**Recommended models:**
 
-Planned additions pending better hardware.
+| Model                        | Notes                            |
+| ---------------------------- | -------------------------------- |
+| `claude-3-5-haiku-20241022`  | Fast, cheap, good for iteration  |
+| `claude-sonnet-4-6`          | Better reasoning, higher cost    |
 
-- `claude-sonnet-4.6` (Anthropic) — next-tier reasoning
+Set `PROVIDER=anthropic`, `MODEL=claude-3-5-haiku-20241022`, and `ANTHROPIC_API_KEY=<your key>` in `.env`.
+
+In the UI, enter your key in the API Key field after selecting Anthropic. Same as above — stays local, only used per session.
+
+---
+
+## Hardware note
+
+Tested locally on an 8GB VRAM GPU. Models above that limit are untested. If you're on lower-end hardware, use a cloud provider — OpenRouter's cheapest models cost fractions of a cent per debate.
+
+## Future
+
+- `claude-opus-4` — when hardware allows
+- Session history (SQLite)
+- Docker packaging

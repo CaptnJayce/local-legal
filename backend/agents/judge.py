@@ -1,5 +1,4 @@
 from backend.agents.base import BaseAgent
-from backend.llm import call_llm
 from backend.models import DebateMessage
 
 _JSON_TEMPLATE = """\
@@ -21,7 +20,7 @@ class Judge(BaseAgent):
     name = "Judge"
     system_prompt = "You are the Judge in a debate council. You score ideas honestly and output only valid JSON."
 
-    async def respond(self, idea: str, history: list[DebateMessage]) -> str:
-        messages = self._build_messages(idea, history)
+    def _build_messages(self, idea: str, history: list[DebateMessage]) -> list[dict]:
+        messages = super()._build_messages(idea, history)
         messages[-1]["content"] += f"\n\n{_JSON_TEMPLATE}"
-        return await call_llm(messages, self.system_prompt)
+        return messages

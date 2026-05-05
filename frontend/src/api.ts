@@ -20,14 +20,28 @@ export interface CouncilEvent {
   score_card: ScoreCard | null;
 }
 
+const API_BASE = "http://localhost:8000";
+const SSE_PREFIX = "data: ";
+
+export interface ServerConfig {
+  provider: string;
+  model: string;
+}
+
+export async function getConfig(): Promise<ServerConfig> {
+  const res = await fetch(`${API_BASE}/config`);
+  if (!res.ok) throw new Error(`Config fetch failed: ${res.status}`);
+  return res.json();
+}
+
 export interface SessionRequest {
   idea: string;
   iterations: number;
   turns_per_round: number;
+  provider?: string;
+  model?: string;
+  api_key?: string;
 }
-
-const API_BASE = "http://localhost:8000";
-const SSE_PREFIX = "data: ";
 
 export async function startSession(
   req: SessionRequest,

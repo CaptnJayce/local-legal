@@ -30,6 +30,9 @@ class SessionRequest(BaseModel):
     idea: str
     iterations: int = 1
     turns_per_round: int = 3
+    provider: str | None = None
+    model: str | None = None
+    api_key: str | None = None
 
 
 @app.post("/session")
@@ -38,7 +41,12 @@ async def session(body: SessionRequest):
 
     async def generate():
         async for event in council.run(
-            body.idea, body.iterations, body.turns_per_round
+            body.idea,
+            body.iterations,
+            body.turns_per_round,
+            provider=body.provider,
+            model=body.model,
+            api_key=body.api_key,
         ):
             yield f"data: {event.model_dump_json()}\n\n"
 
