@@ -172,16 +172,16 @@ A step-by-step build guide. Work through phases in order.
 
 > Make it easy for anyone to run the project with minimal setup.
 
-- [ ] Write `docker-compose.yml`
+- [x] Write `docker-compose.yml`
   - `backend` service: FastAPI on port 8000
   - `frontend` service: nginx serving the React build on port 3000
   - `ollama` service (optional profile): for users who want fully local with no manual Ollama install
   - `docker compose up` should be the only command needed
-- [ ] Write `backend/Dockerfile`
+- [x] Write `backend/Dockerfile`
   - `FROM python:3.12-slim`, copy `backend/`, pip install, uvicorn entrypoint
-- [ ] Write `frontend/Dockerfile`
+- [x] Write `frontend/Dockerfile`
   - Bun build stage + nginx serving `dist/`
-- [ ] Add a `config.yaml.example` file users can copy to `config.yaml`
+- [x] Add a `config.yaml.example` file users can copy to `config.yaml`
   - Documents every setting with comments, safe to commit (no real keys)
 - [ ] Test the full Docker stack from a clean state
   - Remove all local state, `docker compose up`, verify the full flow works end-to-end

@@ -1,0 +1,67 @@
+# local-legal configuration reference
+#
+# This file documents every setting the application reads.
+# Copy relevant values to a .env file at the repo root — the app
+# reads from environment variables, not from this file directly.
+#
+# Quick start:
+#   cp .env.example .env
+#   # edit .env with your chosen provider settings
+#   docker compose up
+
+# ---------------------------------------------------------------------------
+# LLM provider
+# ---------------------------------------------------------------------------
+
+# Which provider to use. One of: ollama, openrouter, anthropic
+# Default: ollama
+PROVIDER: ollama
+
+# Model name. Format depends on provider:
+#   ollama      — bare model name:  llama3.1 | mistral | gemma2
+#   openrouter  — vendor/model:     openai/gpt-4o-mini | anthropic/claude-haiku-4
+#   anthropic   — model ID:         claude-3-5-haiku-20241022 | claude-sonnet-4-6
+MODEL: llama3.1
+
+# ---------------------------------------------------------------------------
+# Provider API keys (only required for the chosen provider)
+# ---------------------------------------------------------------------------
+
+# OpenRouter — get a key at https://openrouter.ai/keys
+# OPENROUTER_API_KEY: sk-or-...
+
+# Anthropic — get a key at https://console.anthropic.com
+# ANTHROPIC_API_KEY: sk-ant-...
+
+# ---------------------------------------------------------------------------
+# Ollama endpoint
+# ---------------------------------------------------------------------------
+
+# Only set this if Ollama is running somewhere other than localhost.
+#
+# When using `docker compose --profile ollama up`, this is automatically
+# overridden to http://ollama:11434 (the container service name) by
+# docker-compose.yml. You do not need to set it manually for that case.
+#
+# OLLAMA_BASE_URL: http://localhost:11434
+
+# ---------------------------------------------------------------------------
+# Docker compose notes
+# ---------------------------------------------------------------------------
+#
+# Default stack (backend + frontend only, uses your local Ollama install):
+#   docker compose up
+#
+# Full stack including a containerised Ollama instance:
+#   docker compose --profile ollama up
+#
+# After starting the Ollama container for the first time, pull a model:
+#   docker compose exec ollama ollama pull llama3.1
+#
+# Recommended models by VRAM:
+#   llama3.1  8B   ~6 GB   default, well-rounded
+#   mistral   7B   ~5 GB   faster
+#   gemma2    9B   ~8 GB   stronger reasoning
+#
+# Cloud providers need no local GPU — set PROVIDER and the relevant API key
+# and docker compose up as normal.
