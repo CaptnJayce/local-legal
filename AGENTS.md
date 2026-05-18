@@ -21,4 +21,4 @@ AI council that debates ideas via Critic, Appraiser, and Judge agents.
 
 ## Current phase
 
-Phase 6 complete. Phase 7 next (settings & provider config UX).
+Phase 7 complete. Phase 8 next (Docker packaging).
