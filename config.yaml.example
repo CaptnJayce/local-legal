@@ -37,31 +37,23 @@ MODEL: llama3.1
 # Ollama endpoint
 # ---------------------------------------------------------------------------
 
-# Only set this if Ollama is running somewhere other than localhost.
-#
-# When using `docker compose --profile ollama up`, this is automatically
-# overridden to http://ollama:11434 (the container service name) by
-# docker-compose.yml. You do not need to set it manually for that case.
-#
-# OLLAMA_BASE_URL: http://localhost:11434
+# Only set this if you need a different endpoint. Default (Docker) is
+# http://ollama:11434 which resolves to the Ollama container.
+# OLLAMA_BASE_URL: http://ollama:11434
 
 # ---------------------------------------------------------------------------
 # Docker compose notes
 # ---------------------------------------------------------------------------
 #
-# Default stack (backend + frontend only, uses your local Ollama install):
 #   docker compose up
 #
-# Full stack including a containerised Ollama instance:
-#   docker compose --profile ollama up
+# This starts all three services: backend (port 8000), frontend (port 3000),
+# and Ollama (port 11434). On first run the llama3.1 model is downloaded
+# automatically — about 5 GB, so it takes a minute.
 #
-# After starting the Ollama container for the first time, pull a model:
-#   docker compose exec ollama ollama pull llama3.1
-#
-# Recommended models by VRAM:
-#   llama3.1  8B   ~6 GB   default, well-rounded
-#   mistral   7B   ~5 GB   faster
-#   gemma2    9B   ~8 GB   stronger reasoning
+# To change the model, edit the ollama service's `command` in
+# docker-compose.yml and replace `llama3.1` with your chosen model.
 #
 # Cloud providers need no local GPU — set PROVIDER and the relevant API key
-# and docker compose up as normal.
+# in .env and docker compose up as normal. The Ollama container will still
+# start but won't be used.

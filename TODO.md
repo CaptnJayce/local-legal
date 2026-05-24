@@ -183,7 +183,7 @@ A step-by-step build guide. Work through phases in order.
   - Bun build stage + nginx serving `dist/`
 - [x] Add a `config.yaml.example` file users can copy to `config.yaml`
   - Documents every setting with comments, safe to commit (no real keys)
-- [ ] Test the full Docker stack from a clean state
+- [x] Test the full Docker stack from a clean state
   - Remove all local state, `docker compose up`, verify the full flow works end-to-end
 - [ ] _(Optional — v2)_ Explore Tauri for a native desktop app
   - Wraps the React frontend, bundles the Python backend

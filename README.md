@@ -6,7 +6,20 @@ An LLM council that debates your ideas. Three agents — Critic, Appraiser, and 
 
 Bring an idea. The Critic looks for holes, the Appraiser fights back and builds it up, and the Judge scores and refines. Set iterations higher to run the improved idea back through the whole cycle — each pass tightens it further.
 
-## Setup
+## Quickstart — Docker
+
+```bash
+cp .env.example .env
+docker compose up
+```
+
+Open [http://localhost:3000](http://localhost:3000).
+
+On first run, the Ollama container downloads the llama3.1 model (~5 GB) — grab a coffee. After that it starts instantly.
+
+---
+
+## Manual setup
 
 ### Prerequisites
 
@@ -32,7 +45,7 @@ bun install
 
 Copy `.env.example` to `.env` and fill in the relevant values for your chosen provider. The app uses these as defaults — you can override them per-session from the settings panel.
 
-## Run
+### Run
 
 ```bash
 # Backend (from repo root, with venv active)
@@ -131,4 +144,3 @@ Tested locally on an 8GB VRAM GPU. Models above that limit are untested. If you'
 
 - `claude-opus-4` — when hardware allows
 - Session history (SQLite)
-- Docker packaging
